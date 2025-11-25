@@ -48,7 +48,7 @@ jobs:
     - name: Generate Habitat Origin Key
       run: |
         hab origin key generate "$env:HAB_ORIGIN"
-    - name: Install Chef CLI  # <-- ADD THIS STEP
+    - name: Install Chef CLI
       run: |
         hab pkg install --binlink --force chef/chef-cli --channel unstable
     - name: Build Habitat Package
@@ -85,7 +85,6 @@ jobs:
             Write-Error "Failed to install Policyfile"
             Exit 1
         }
-
         # Export the policy and all cookbooks to a sandbox directory
         # This is exactly what Test Kitchen does
         hab pkg exec chef/chef-cli chef-cli export Policyfile.lock.json policy-export --force
@@ -93,7 +92,9 @@ jobs:
             Write-Error "Failed to export Policyfile"
             Exit 1
         }
-
+        # Add 7-Zip to PATH so archive_file can find it for .tar.xz extraction
+        # This is required because hab pkg exec isolates the environment
+        $env:PATH = "C:\Program Files\7-Zip;" + $env:PATH
         # Run chef-client in local mode from the exported directory
         # Just like Test Kitchen does: cd <export-dir> && chef-client -z
         cd policy-export
