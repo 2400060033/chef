@@ -16,8 +16,7 @@ defaults:
     working-directory: kitchen-tests
 
 jobs:
-  # test-kitchen-enterprise currently supports only kitchen-dokken driver for linux platforms,
-  # so we are testing on windows by running habitat package of Infra Client chef-client in local mode.
+  # Testing on windows by running habitat package of Infra Client chef-client in local mode.
   win_x86_64:
     name: win_x86_64_hab
     strategy:
@@ -36,7 +35,6 @@ jobs:
       HAB_AUTH_TOKEN: ${{ secrets.HAB_AUTH_TOKEN }}
     steps:
     - uses: actions/checkout@v4
-
     - name: Install Habitat CLI
       run: |
         # Install Habitat using Chocolatey
@@ -47,15 +45,12 @@ jobs:
         echo "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
         hab license accept
         hab --version
-
     - name: Generate Habitat Origin Key
       run: |
         hab origin key generate "$env:HAB_ORIGIN"
-
     - name: Install Chef CLI  # <-- ADD THIS STEP
       run: |
         hab pkg install --binlink --force chef/chef-cli --channel unstable
-
     - name: Build Habitat Package
       run: |
         # Move to repo root
@@ -74,12 +69,14 @@ jobs:
             Write-Error "No package built"
             Exit 1
         }
-
     - name: Install Chef Infra Client Habitat Package
       run: |
         hab pkg install chef-infra-client-latest.hart
         hab pkg exec $env:HAB_ORIGIN/chef-infra-client chef-client --version
-
+    - name: Install pre-requisite dev-tools
+      run: |
+        # XZ Utils for archive tests
+        choco install -y 7zip
     - name: Run end-to-end recipes in Local Mode
       run: |
         # Install the Policyfile (resolves dependencies)

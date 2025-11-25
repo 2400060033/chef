@@ -1,4 +1,4 @@
-# Not in use for currently since chef-test-kitchen-enterprise does not yet support windows platform.
+# Not in use anymore.
 # For windows end-to-end recipe testing we are running Habitat package of Infra client in local mode.
 ---
 driver:

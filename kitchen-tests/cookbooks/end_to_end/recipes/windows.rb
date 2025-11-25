@@ -191,11 +191,6 @@ include_recipe "::_chef_client_trusted_certificate"
 
 include_recipe "git"
 
-# Install xz utility for .tar.xz archive extraction
-chocolatey_package "xz" do
-  action :install
-end
-
 # test various archive formats in the archive_file resource
 %w{tourism.tar.gz tourism.tar.xz tourism.zip}.each do |archive|
   cookbook_file File.join(Chef::Config[:file_cache_path], archive) do
